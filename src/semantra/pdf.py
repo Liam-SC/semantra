@@ -6,6 +6,11 @@ from tqdm import tqdm
 from .util import get_converted_pdf_txt_filename, get_pdf_positions_filename
 
 mutexes = {}
+package_directory = os.path.dirname(os.path.abspath(__file__))
+tokenizer = AutoTokenizer.from_pretrained("facebook/nllb-200-distilled-600M", use_auth_token=True, src_lang="kor_Hang")
+model = AutoModelForSeq2SeqLM.from_pretrained("facebook/nllb-200-distilled-600M", use_auth_token=True)
+
+pbar = tqdm(file_list, disable=False)
 
 
 def get_mutex(filename):
@@ -86,13 +91,19 @@ def get_pdf_content(md5, filename, semantra_dir, force, silent):
             converted_txt, "r", newline="", encoding="utf-8", errors="ignore"
         ) as f:
             rawtext = f.read()
-        return PDFContent(rawtext, filename, positions)
+            inputs = tokenizer(rawtext, return_tensors="pt")
+            translated_tokens = model.generate(**inputs, forced_bos_token_id=tokenizer.lang_code_to_id["kor_Hang"], max_length=1024)
+            res = tokenizer.batch_decode(translated_tokens, skip_special_tokens=True)[0]
+        return PDFContent(res, filename, positions)
     else:
         with open(
             converted_txt, "r", newline="", encoding="utf-8", errors="ignore"
         ) as f:
             rawtext = f.read()
+            inputs = tokenizer(rawtext, return_tensors="pt")
+            translated_tokens = model.generate(**inputs, forced_bos_token_id=tokenizer.lang_code_to_id["kor_Hang"], max_length=1024)
+            res = tokenizer.batch_decode(translated_tokens, skip_special_tokens=True)[0]
         with open(position_index, "r", encoding="utf-8") as f:
             positions = json.load(f)
 
-        return PDFContent(rawtext, filename, positions)
+        return PDFContent(res, filename, positions)
