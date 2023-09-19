@@ -4,14 +4,12 @@ import json
 import os
 from tqdm import tqdm
 from .util import get_converted_pdf_txt_filename, get_pdf_positions_filename
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 mutexes = {}
 package_directory = os.path.dirname(os.path.abspath(__file__))
 tokenizer = AutoTokenizer.from_pretrained("facebook/nllb-200-distilled-600M", use_auth_token=True, src_lang="kor_Hang")
 model = AutoModelForSeq2SeqLM.from_pretrained("facebook/nllb-200-distilled-600M", use_auth_token=True)
-
-pbar = tqdm(file_list, disable=False)
 
 
 def get_mutex(filename):
