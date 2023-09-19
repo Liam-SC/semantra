@@ -8,8 +8,8 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 mutexes = {}
 package_directory = os.path.dirname(os.path.abspath(__file__))
-tokenizer = AutoTokenizer.from_pretrained("facebook/nllb-200-distilled-600M", use_auth_token=True, src_lang="kor_Hang")
-model = AutoModelForSeq2SeqLM.from_pretrained("facebook/nllb-200-distilled-600M", use_auth_token=True)
+tokenizer = AutoTokenizer.from_pretrained("facebook/nllb-200-distilled-600M", src_lang="kor_Hang")
+model = AutoModelForSeq2SeqLM.from_pretrained("facebook/nllb-200-distilled-600M")
 
 
 def get_mutex(filename):
